@@ -110,11 +110,7 @@ def _find_best_pairs(points, count_b):
 def calculate_match(interests_a, interests_b):
     """Returns the percentage, matched pairs, and unmatched labels.
 
-    Each person can have up to 5 interests after removing repeated IDs.
-    Plain text is allowed, but only gets a basic ID, with no AI understanding.
-    Tagged interests use a dictionary containing label, standard_id, category,
-    and subcategory. Missing fields and None are treated as empty strings.
-    Other non-text values raise ValueError. Original inputs are left intact."""
+    Each person can have up to 5 interests after removing repeated IDs."""
 
     list_a = _read_interests("interests_a", interests_a)
     list_b = _read_interests("interests_b", interests_b)
