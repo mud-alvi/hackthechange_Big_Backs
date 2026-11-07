@@ -10,8 +10,15 @@ def _read_interests(name, interests):
     fields = ("label", "standard_id", "category", "subcategory")
 
     for index, interest in enumerate(interests):
+        #Allow custom text too. AI will add the proper tags later.
+        if isinstance(interest, str):
+            text = interest.strip()
+            if not text:
+                raise ValueError(f"{name}[{index}] cannot be blank.")
+            interest = {"label": interest,"standard_id": "_".join(text.casefold().split()),"category": "","subcategory": ""}
+
         if not isinstance(interest, dict):
-            raise ValueError(f"{name}[{index}] must be a dictionary.")
+            raise ValueError(f"{name}[{index}] must be text or a dictionary.")
 
         item = {}
         for field in fields:
@@ -36,6 +43,8 @@ def _read_interests(name, interests):
             seen_ids.add(interest_id)
 
         cleaned.append(item)
+        if len(cleaned) > 5:
+            raise ValueError(f"{name} can have up to 5 interests for the demo.")
 
     return cleaned
 
@@ -99,9 +108,11 @@ def _find_best_pairs(points, count_b):
     return search(0, tuple(range(count_b)))
 
 def calculate_match(interests_a, interests_b):
-    """Retuns the percentage, matched pairs, and unmatched labels.
+    """Returns the percentage, matched pairs, and unmatched labels.
 
-    Each interest is a dictionary containing label, standard_id, category,
+    Each person can have up to 5 interests after removing repeated IDs.
+    Plain text is allowed, but only gets a basic ID, with no AI understanding.
+    Tagged interests use a dictionary containing label, standard_id, category,
     and subcategory. Missing fields and None are treated as empty strings.
     Other non-text values raise ValueError. Original inputs are left intact."""
 
