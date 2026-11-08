@@ -1,0 +1,8 @@
+#Local settings and saved personal profiles
+.env
+.env.*
+!.env.example
+python/data/
+__pycache__/
+*.pyc
+.venv/
