@@ -14,20 +14,22 @@ The module does not handle interests, purpose matching, user profiles, BLE, APIs
 
 ## Module
 
-`app.scoring.skills_matcher`
+```
+app.scoring.skills_matcher
+```
 
 ## Public functions
 
-### 1. calculate_skill_exchange()
+### 1. `calculate_skill_exchange()`
 
-Inputs:
+**Inputs:**
 
 - `skills_a_have: list[str]`
 - `skills_a_want: list[str]`
 - `skills_b_have: list[str]`
 - `skills_b_want: list[str]`
 
-Returns:
+**Returns:**
 
 - `score`: average available directional coverage, from 0 to 100, or `None`.
 - `a_teaches_b`: how much A can teach B.
@@ -37,9 +39,9 @@ Returns:
 - `matched_directions`: number of directions with at least one match.
 - `is_mutual`: whether both directions have a positive match.
 
-### 2. calculate_collaboration_match()
+### 2. `calculate_collaboration_match()`
 
-Inputs:
+**Inputs:**
 
 - `skills_a_have: list[str]`
 - `skills_a_need: list[str]`
@@ -51,14 +53,14 @@ Returns the same overall metadata structure as skill exchange, with directional 
 - `a_supports_b`
 - `b_supports_a`
 
-### 3. calculate_learning_partner_match()
+### 3. `calculate_learning_partner_match()`
 
-Inputs:
+**Inputs:**
 
 - `skills_a_want: list[str]`
 - `skills_b_want: list[str]`
 
-Returns:
+**Returns:**
 
 - `score`: average available directional overlap, from 0 to 100, or `None`.
 - `shared_skills`: canonical skills both want to learn.
@@ -68,13 +70,33 @@ Returns:
 - `b_shared_coverage`: shared-skill coverage for B.
 - Reciprocity metadata.
 
+## Directional result structure
+
+Each directional result contains:
+
+- `score`: directional coverage from 0 to 100, or `None` if the direction cannot be evaluated.
+- `matched`: sorted list of canonical skills that overlap.
+- `unmatched`: sorted list of required skills that are not covered.
+
+For example:
+
+```json
+{
+  "score": 66.7,
+  "matched": ["python", "react"],
+  "unmatched": ["docker"]
+}
+```
+
 ## Scoring semantics
 
 Directional coverage is:
 
-`matched required skills / total required skills * 100`
+```
+matched required skills / total required skills × 100
+```
 
-For example, if B wants Python, React, and Docker, and A has Python and React:
+For example, if B wants Python, React, and Docker, and A has Python and React, then A covers 66.7% of B's requirements (`a_teaches_b` in skill exchange, `a_supports_b` in collaboration):
 
 - Matched: Python, React
 - Unmatched: Docker
@@ -107,19 +129,19 @@ Known aliases map to canonical names, including:
 
 | Input variations | Canonical name |
 |---|---|
-| JS, JavaScript | javascript |
-| TS, TypeScript | typescript |
-| ML, Machine Learning | machine learning |
-| AI, Artificial Intelligence | artificial intelligence |
-| Postgres, PostgreSQL | postgresql |
-| NodeJS, Node.js | node.js |
-| ReactJS, React.js, React | react |
-| C Sharp, C-Sharp, C# | c# |
-| dotnet, .NET | .net |
-| K8s, Kubernetes | kubernetes |
-| AWS, Amazon Web Services | amazon web services |
-| HTML5, HTML | html |
-| CSS3, CSS | css |
+| JS, JavaScript | `javascript` |
+| TS, TypeScript | `typescript` |
+| ML, Machine Learning | `machine learning` |
+| AI, Artificial Intelligence | `artificial intelligence` |
+| Postgres, PostgreSQL | `postgresql` |
+| NodeJS, Node.js | `node.js` |
+| ReactJS, React.js, React | `react` |
+| C Sharp, C-Sharp, C# | `c#` |
+| dotnet, .NET | `.net` |
+| K8s, Kubernetes | `kubernetes` |
+| AWS, Amazon Web Services | `amazon web services` |
+| HTML5, HTML | `html` |
+| CSS3, CSS | `css` |
 
 Unknown skill names are preserved after trimming and case normalization. No fuzzy matching or AI inference is performed.
 
@@ -145,6 +167,8 @@ Do not interpret `score=None` as a zero score. It means the direction could not 
 
 Run the complete backend test suite from the `backend/` directory:
 
-`pytest -v`
+```bash
+pytest -v
+```
 
-The standalone matcher currently has dedicated tests for matching behavior, metadata, aliases, and invalid inputs.
+The standalone matcher has dedicated tests for matching behavior, metadata, aliases, and invalid inputs.
