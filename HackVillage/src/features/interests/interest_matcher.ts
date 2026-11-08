@@ -1,5 +1,5 @@
-import {readInterests} from "./interest_data.ts";
-import type {Interest, MatchResult} from "./types.ts";
+import {readInterests} from "./interest_data";
+import type {Interest, MatchResult} from "./types";
 
 function pairPoints(a: Interest, b: Interest): number {
     if (a.standard_id === b.standard_id) return 100;

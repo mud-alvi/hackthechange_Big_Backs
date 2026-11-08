@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Animated,
   Easing,
@@ -15,8 +15,8 @@ import {
 } from '../../constants/introTheme';
 
 export function WavingMascot() {
-  const wave = useRef(new Animated.Value(0)).current;
-  const float = useRef(new Animated.Value(0)).current;
+  const [wave] = useState(() => new Animated.Value(0));
+  const [float] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const waving = Animated.loop(

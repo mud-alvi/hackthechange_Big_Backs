@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useVillageNetwork } from './useVillageNetwork';
 import {
   BASE_LOOK,
   type AvatarLook,
@@ -70,7 +71,6 @@ function useVillageState() {
   const [notice, setNotice] = useState('');
   const hydratedFor = useRef<string | null>(null);
   const persistenceQueue = useRef<Promise<unknown>>(Promise.resolve());
-  const idCounter = useRef(0);
   const userId = session?.user.id;
   const fallbackName =
     typeof session?.user.user_metadata?.username === 'string'
@@ -129,22 +129,6 @@ function useVillageState() {
       setNotice(storageNotice);
       hydratedFor.current = userId;
       setHydratedUserId(userId);
-      const { data: row, error } = await supabase
-        .from('profiles')
-        .select('username,total_xp,user_code')
-        .eq('id', userId)
-        .maybeSingle();
-      if (!active) return;
-      if (error) {
-        setNotice('Using your account name. Village stats could not be loaded.');
-        return;
-      }
-      if (row)
-        setProfile({
-          username: row.username || fallbackName,
-          total_xp: Math.max(0, Number(row.total_xp) || 0),
-          user_code: row.user_code || '',
-        });
     })().catch(() => {
       if (active)
         setNotice('Village stats could not be loaded. Your saved appearance is still available.');
@@ -208,23 +192,6 @@ function useVillageState() {
     });
   }, [recordEncounter]);
 
-  const sendMessage = useCallback((encounterId: string, text: string) => {
-    const clean = text.trim();
-    if (!clean || clean.length > 1000 || !hydratedFor.current) return false;
-    const message: Message = {
-      id: `local-${Date.now()}-${++idCounter.current}`,
-      text: clean,
-      sender: 'me',
-      createdAt: new Date().toISOString(),
-    };
-    setData((current) => ({
-      ...current,
-      encounters: current.encounters.map((e) =>
-        e.id === encounterId ? { ...e, messages: [...e.messages, message] } : e,
-      ),
-    }));
-    return true;
-  }, []);
   const markRead = useCallback(
     (id: string) =>
       setData((current) => {
@@ -234,10 +201,6 @@ function useVillageState() {
           encounters: current.encounters.map((e) => (e.id === id ? { ...e, unread: 0 } : e)),
         };
       }),
-    [],
-  );
-  const saveLook = useCallback(
-    (look: AvatarLook) => setData((current) => ({ ...current, look })),
     [],
   );
   const setMotion = useCallback(
@@ -274,18 +237,20 @@ function useVillageState() {
       ),
     }));
   }, []);
+  const network = useVillageNetwork({ session, ready, setData, setProfile, setNotice });
   return {
+    ...network,
     session,
     authReady,
     ready,
     profile,
     data,
     notice,
-    saveLook,
+    saveLook: network.saveLookRemote,
     setMotion,
     recordEncounter,
     addSampleEncounter,
-    sendMessage,
+    sendMessage: network.sendMessageRemote,
     receiveMessage,
     markRead,
     clearSamples,

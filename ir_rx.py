@@ -64,7 +64,7 @@ class IR_RX():
         self._times = array('i',  (0 for _ in range(nedges + 1)))  # +1 for overrun
         pin.irq(handler = self._cb_pin, trigger = (Pin.IRQ_FALLING | Pin.IRQ_RISING))
         self.edge = 0
-        self.tim = Timer(0)  # Sofware timer
+        self.tim = Timer(0)  # ESP32 MicroPython 1.28 does not support virtual timers.
         self.cb = self.decode
 
     # Pin interrupt. Save time of each edge for later decode.
@@ -90,6 +90,15 @@ class IR_RX():
     def close(self):
         self._pin.irq(handler = None)
         self.tim.deinit()
+
+    def pause(self):
+        self._pin.irq(handler=None)
+        self.tim.deinit()
+        self.edge = 0
+
+    def resume(self):
+        self.edge = 0
+        self._pin.irq(handler=self._cb_pin, trigger=(Pin.IRQ_FALLING | Pin.IRQ_RISING))
 
 
 class NEC_ABC(IR_RX):
@@ -126,10 +135,10 @@ class NEC_ABC(IR_RX):
             cmd = (val >> 16) & 0xff
             if cmd != (val >> 24) ^ 0xff:
                 raise RuntimeError(self.BADDATA)
-            if addr != ((val >> 8) ^ 0xff) & 0xff:  # 8 bit addr doesn't match check
-                if not self._extended:
-                    raise RuntimeError(self.BADADDR)
-                addr |= val & 0xff00  # pass assumed 16 bit address to callback
+            if self._extended:
+                addr = val & 0xffff
+            elif addr != ((val >> 8) ^ 0xff) & 0xff:
+                raise RuntimeError(self.BADADDR)
             self._addr = addr
         except RuntimeError as e:
             cmd = e.args[0]

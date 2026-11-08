@@ -38,14 +38,14 @@ declare
     result jsonb;
 begin
     if auth.uid() is null then raise exception 'Sign in first'; end if;
-    if code is null or upper(trim(code)) !~ '^[A-Z]{3}[0-9]{4}$' then
+    if code is null or trim(code) !~ '^[0-9]{6}$' then
         raise exception 'Invalid user code';
     end if;
     select jsonb_build_object('user_code', p.user_code,
         'interests', case when i.share_for_matching then i.interests else '[]'::jsonb end)
     into strict result
     from public.profiles p left join public.user_interests i on i.owner_id = p.id
-    where p.user_code = upper(trim(code));
+    where p.user_code = trim(code);
     return result;
 exception when no_data_found then
     return null;

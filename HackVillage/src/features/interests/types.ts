@@ -7,6 +7,7 @@ export type FoundUser = {user_code: string,source: "bluetooth" | "infrared"};
 export type MatchResult = {score: number | null,matched_pairs: {label_a: string,label_b: string,similarity: number}[],unmatched_a: string[],unmatched_b: string[]};
 
 export interface ProfileStore {
+    getMyUserCode?(): Promise<string>;
     getMyProfile(): Promise<InterestProfile>;
     findByCode(code: string): Promise<InterestProfile | null>;
     saveMyInterests(interests: Interest[], shareForMatching: boolean): Promise<void>;

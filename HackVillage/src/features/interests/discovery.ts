@@ -1,6 +1,6 @@
-import {readUserCode} from "./interest_data.ts";
-import {calculateInterestMatch} from "./interest_matcher.ts";
-import type {DiscoveryResult, DiscoverySettings, FoundUser, ProfileStore} from "./types.ts";
+import {readUserCode} from "./interest_data";
+import {calculateInterestMatch} from "./interest_matcher";
+import type {DiscoveryResult, DiscoverySettings, FoundUser, ProfileStore} from "./types";
 
 export type SkillMatcher = (otherCode: string) => Promise<number | null>;
 
@@ -25,15 +25,19 @@ export function createDiscoveryHandler(store: ProfileStore, getSkillScore?: Skil
         const started = generation;
         busy.add(key);
         try {
-            const me = await store.getMyProfile();
-            if (code === me.user_code) return null;
-            const other = await store.findByCode(code);
-            if (!other) throw new Error("That user has no available matching profile.");
+            const myCode = store.getMyUserCode ? await store.getMyUserCode() : (await store.getMyProfile()).user_code;
+            if (code === myCode) return null;
             const result: DiscoveryResult = {user_code: code,source: found.source,mode: settings.mode,interest_score: null,skill_score: null,interest_match: null,should_notify: false,requires_mutual_acceptance: true,warnings: []};
             if (settings.mode !== "skills") {
-                result.interest_match = calculateInterestMatch(me.interests, other.interests);
-                result.interest_score = result.interest_match.score;
-                if (result.interest_score === null) result.warnings.push("Interest data is missing.");
+                try {
+                    const [me, other] = await Promise.all([store.getMyProfile(), store.findByCode(code)]);
+                    if (!other) throw new Error('No matching profile.');
+                    result.interest_match = calculateInterestMatch(me.interests, other.interests);
+                    result.interest_score = result.interest_match.score;
+                    if (result.interest_score === null) result.warnings.push("Interest data is missing.");
+                } catch {
+                    result.warnings.push('Interest data could not be loaded.');
+                }
             }
             if (settings.mode !== "interests") {
                 if (!getSkillScore) {

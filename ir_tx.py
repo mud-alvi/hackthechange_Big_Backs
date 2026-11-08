@@ -69,7 +69,7 @@ class IR:
 
     def __init__(self, pin, cfreq, asize, duty, verbose):
         if ESP32:
-            self._rmt = RMT(0, pin=pin, clock_div=80, tx_carrier=(cfreq, duty, 1))  # 1μs resolution
+            self._rmt = RMT(pin=pin, resolution_hz=1000000, tx_carrier=(cfreq, duty, 1))
         elif RP2:  # PIO-based RMT-like device
             self._rmt = RP2_RMT(pin_pulse=None, carrier=(pin, cfreq, duty))  # 1μs resolution
         else:  # Pyboard
@@ -82,7 +82,7 @@ class IR:
             self._duty = duty
             self._tim = Timer(5)  # Timer 5 controls carrier on/off times
         self._tcb = self._cb  # Pre-allocate
-        self._arr = array('H', 0 for _ in range(asize))  # on/off times (μs)
+        self._arr = array('H', (0 for _ in range(asize)))  # on/off times (μs)
         self._mva = memoryview(self._arr)
         # Subclass interface
         self.verbose = verbose
@@ -187,3 +187,17 @@ class NEC(IR):
         self.aptr = 0
         self.append(9000, 2250, _TBURST)
         self.trigger()  # Initiate physical transmission.
+
+
+class NEC16(NEC):
+    """Send all address bits even when they resemble a NEC8 checksum."""
+    def tx(self, addr, data, _):
+        self.append(9000, 4500)
+        for _ in range(16):
+            self._bit(addr & 1)
+            addr >>= 1
+        data |= ((data ^ 0xff) << 8)
+        for _ in range(16):
+            self._bit(data & 1)
+            data >>= 1
+        self.append(_TBURST)

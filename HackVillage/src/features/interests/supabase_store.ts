@@ -1,8 +1,8 @@
-import {readInterests, readLabels, readUserCode} from "./interest_data.ts";
-import type {Interest, InterestProfile, ProfileStore} from "./types.ts";
+import {readInterests, readLabels, readUserCode} from "./interest_data";
+import type {Interest, InterestProfile, ProfileStore} from "./types";
 
 //Confirm these names against your friend's database before going live.
-export const DATABASE = {profiles: "profiles",interests: "user_interests",lookup: "lookup_interest_profile",normalizer: "normalize-interests"};
+export const DATABASE = {profiles: "village_profiles",interests: "village_matching",lookup: "village_lookup",normalizer: "normalize-interests"};
 
 export type StoreOptions = {url: string,publishableKey: string,getSession: () => Promise<{access_token: string,user: {id: string}} | null>,fetcher?: typeof fetch};
 
@@ -64,8 +64,8 @@ export function createSupabaseStore(options: StoreOptions): ProfileStore & {norm
             const tags = readInterests(interests);
             if (typeof shareForMatching !== "boolean") throw new Error("Choose whether to share your interests for matching.");
             const signedIn = await session();
-            await request(`/rest/v1/${DATABASE.interests}?on_conflict=owner_id`, signedIn.access_token, "POST",
-                {owner_id: signedIn.user.id,interests: tags,share_for_matching: shareForMatching}, "resolution=merge-duplicates,return=minimal");
+            await request('/rest/v1/rpc/village_save_interests', signedIn.access_token, "POST",
+                {p_interests: tags,p_share: shareForMatching});
         },
         async normalize(labels) {
             const checked = readLabels(labels);
