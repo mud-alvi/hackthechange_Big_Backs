@@ -1,0 +1,7 @@
+[
+    {"label": "Football","standard_id": "football","category": "sports","subcategory": "field_ball_sports"},
+    {"label": "Basketball","standard_id": "basketball","category": "sports","subcategory": "court_ball_sports"},
+    {"label": "Gaming","standard_id": "gaming","category": "entertainment","subcategory": "video_games"},
+    {"label": "AI","standard_id": "artificial_intelligence","category": "technology","subcategory": "artificial_intelligence"},
+    {"label": "Snowboarding","standard_id": "snowboarding","category": "sports","subcategory": "winter_board_sports"}
+]

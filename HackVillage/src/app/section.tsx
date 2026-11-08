@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text } from 'react-native';
-import { Games, Coding } from '../components/village/Activities';
+import { Coding, Games } from '../components/village/Activities';
 import { AvatarEditor } from '../components/village/AvatarEditor';
 import { Chats, ChatThread } from '../components/village/Chats';
 import { BottomNav, PageHeader, type Tab } from '../components/village/Navigation';
