@@ -1,0 +1,11 @@
+# User functions verify bearer tokens through Supabase Auth themselves. The legacy
+# gateway verifier does not accept this project's ES256 signing keys.
+[functions.networking]
+verify_jwt = false
+
+[functions.normalize-interests]
+verify_jwt = false
+
+# Worker authenticates x-dispatch-secret itself. Never put this secret in the app.
+[functions.dispatch-push]
+verify_jwt = false

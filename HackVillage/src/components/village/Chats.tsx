@@ -15,12 +15,14 @@ import { C, F, ui } from '../../constants/villageTheme';
 import { useVillage } from '../../state/VillageProvider';
 import type { Encounter, Message } from '../../types/village';
 import { Avatar } from './Avatar';
+import { ConnectionRequests } from './ConnectionRequests';
 
 function timeLabel(value: string) {
   return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 export function Chats() {
-  const { data, addSampleEncounter } = useVillage();
+  const { data, refreshNetwork, lastMatch, notice } = useVillage();
+  const [refreshError, setRefreshError] = useState('');
   const [query, setQuery] = useState('');
   const filtered = data.encounters.filter((e) =>
     e.name.toLowerCase().includes(query.toLowerCase().trim()),
@@ -40,12 +42,15 @@ export function Chats() {
           Meet in person. Connect here.
         </Text>
         <Text style={ui.body}>
-          When your Arduinos exchange a beep, your new conversation appears here.
+          Your board finds nearby people. Accept a request together to start a conversation.
         </Text>
         <Text style={ui.caption}>
-          Front-end preview · device connection comes from your backend.
+          Your interest and skill scores are shown separately.
         </Text>
       </View>
+      <ConnectionRequests />
+      {lastMatch && <Text style={ui.caption}>Last match with {lastMatch.user_code}: I {lastMatch.interest_score ?? '—'} · S {lastMatch.skill_score ?? '—'}</Text>}
+      {!!notice && <Text style={ui.body}>{notice}</Text>}
       {!!data.encounters.length && (
         <TextInput
           accessibilityLabel="Search connections"
@@ -70,20 +75,14 @@ export function Chats() {
           <Text style={[ui.body, { textAlign: 'center' }]}>
             {query
               ? 'Try a different name.'
-              : 'No encounters yet. Try a sample to explore the chat experience.'}
+              : 'Accepted connections will appear here. Check pending requests above.'}
           </Text>
         </View>
       )}
-      <Pressable
-        accessibilityRole="button"
-        style={({ pressed }) => [ui.button, ui.subtle, pressed && ui.pressed]}
-        onPress={addSampleEncounter}
-      >
-        <Text style={[ui.buttonText, ui.subtleText]}>Add a sample encounter</Text>
-      </Pressable>
-      <Text style={[ui.caption, { textAlign: 'center' }]}>
-        Sample chats and messages stay on this device.
-      </Text>
+      <Pressable accessibilityRole="button" style={[ui.button, ui.subtle]} onPress={() => {
+        setRefreshError(''); void refreshNetwork().catch(error => setRefreshError(String(error)));
+      }}><Text style={[ui.buttonText, ui.subtleText]}>Refresh connections</Text></Pressable>
+      {!!refreshError && <Text style={ui.body}>{refreshError}</Text>}
     </ScrollView>
   );
 }
@@ -131,11 +130,15 @@ function ChatRow({ encounter }: { encounter: Encounter }) {
 }
 
 export function ChatThread({ id }: { id: string }) {
-  const { data, sendMessage, markRead } = useVillage();
+  const { data, sendMessage, markRead, fetchMessages, hasOlder, notice } = useVillage();
+  const [loadError, setLoadError] = useState('');
   const encounter = data.encounters.find((e) => e.id === id);
   const [draft, setDraft] = useState('');
   const list = useRef<FlatList<Message>>(null);
   const sending = useRef(false);
+  useEffect(() => {
+    void fetchMessages(id).catch(error => setLoadError(String(error)));
+  }, [id, fetchMessages]);
   useEffect(() => {
     if (encounter?.unread) markRead(id);
   }, [encounter?.unread, id, markRead]);
@@ -152,11 +155,11 @@ export function ChatThread({ id }: { id: string }) {
         </Pressable>
       </View>
     );
-  function send() {
+  async function send() {
     if (sending.current) return;
     sending.current = true;
-    if (sendMessage(id, draft)) setDraft('');
-    sending.current = false;
+    try { if (await sendMessage(id, draft)) setDraft(''); }
+    finally { sending.current = false; }
   }
   return (
     <KeyboardAvoidingView style={s.thread} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -171,7 +174,9 @@ export function ChatThread({ id }: { id: string }) {
           </Text>
         </View>
       </View>
-      <Text style={s.localBanner}>LOCAL PREVIEW · Messages are saved here, not delivered.</Text>
+      <Text style={s.localBanner}>You both accepted this connection.</Text>
+      {!!(loadError || notice) && <Text style={[ui.caption, { paddingHorizontal: 20 }]}>{loadError || notice}</Text>}
+      {hasOlder[id] && <Pressable onPress={() => { void fetchMessages(id, true).catch(error => setLoadError(String(error))); }} style={[ui.button, ui.subtle]}><Text style={[ui.buttonText, ui.subtleText]}>Load older messages</Text></Pressable>}
       <FlatList
         ref={list}
         style={{ flex: 1 }}
@@ -215,7 +220,7 @@ export function ChatThread({ id }: { id: string }) {
             </View>
             <Text style={s.messageTime}>
               {timeLabel(item.createdAt)}
-              {item.sender === 'me' ? ' · saved locally' : ''}
+              {item.sender === 'me' ? ' · sent' : ''}
             </Text>
           </View>
         )}
@@ -233,10 +238,10 @@ export function ChatThread({ id }: { id: string }) {
         />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Send message locally"
+          accessibilityLabel="Send message"
           accessibilityState={{ disabled: !draft.trim() }}
           disabled={!draft.trim()}
-          onPress={send}
+          onPress={() => void send()}
           style={({ pressed }) => [
             s.send,
             !draft.trim() && { opacity: 0.35 },

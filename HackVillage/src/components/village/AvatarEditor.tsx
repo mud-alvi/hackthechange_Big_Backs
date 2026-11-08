@@ -4,6 +4,7 @@ import { C, F, ui } from '../../constants/villageTheme';
 import { useVillage } from '../../state/VillageProvider';
 import { BASE_LOOK, type AvatarLook } from '../../types/village';
 import { Avatar } from './Avatar';
+import { MatchingProfileEditor } from './MatchingProfileEditor';
 
 type Category = keyof AvatarLook;
 const categories: { id: Category; label: string }[] = [
@@ -37,6 +38,8 @@ export function AvatarEditor() {
   const [draft, setDraft] = useState<AvatarLook>({ ...data.look });
   const [category, setCategory] = useState<Category>('shirt');
   const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   const dirty = JSON.stringify(draft) !== JSON.stringify(data.look);
   function choose(value: string) {
     setDraft((current) => ({ ...current, [category]: value }));
@@ -110,10 +113,12 @@ export function AvatarEditor() {
             { flex: 1, opacity: dirty ? 1 : 0.6 },
             pressed && ui.pressed,
           ]}
-          disabled={!dirty}
-          onPress={() => {
-            saveLook({ ...draft });
-            setSaved(true);
+          disabled={!dirty || busy}
+          onPress={async () => {
+            setBusy(true); setError('');
+            try { await saveLook({ ...draft }); setSaved(true); }
+            catch (failure) { setError(failure instanceof Error ? failure.message : 'Could not save your look.'); }
+            finally { setBusy(false); }
           }}
         >
           <Text style={ui.buttonText}>Save my look</Text>
@@ -133,9 +138,11 @@ export function AvatarEditor() {
         {dirty
           ? 'Previewing changes · save to update your homepage.'
           : saved
-            ? 'Look saved on this device. Looking good!'
-            : 'Your look is saved on this device.'}
+            ? 'Your look is saved to your account.'
+            : 'Your look is saved to your account.'}
       </Text>
+      {!!error && <Text style={ui.body}>{error}</Text>}
+      <MatchingProfileEditor />
       <View style={ui.card}>
         <Text style={ui.heading}>Your village</Text>
         <View style={ui.row}>

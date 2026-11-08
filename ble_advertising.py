@@ -34,6 +34,8 @@ def advertising_payload(limited_disc=False, br_edr=False, name=None, services=No
     )
 
     if name:
+        if isinstance(name, str):
+            name = name.encode('utf-8')
         _append(_ADV_TYPE_NAME, name)
 
     if services:
@@ -71,9 +73,9 @@ def decode_name(payload):
 def decode_services(payload):
     services = []
     for u in decode_field(payload, _ADV_TYPE_UUID16_COMPLETE):
-        services.append(bluetooth.UUID(struct.unpack("<h", u)[0]))
+        services.append(bluetooth.UUID(struct.unpack("<H", u)[0]))
     for u in decode_field(payload, _ADV_TYPE_UUID32_COMPLETE):
-        services.append(bluetooth.UUID(struct.unpack("<d", u)[0]))
+        services.append(bluetooth.UUID(struct.unpack("<I", u)[0]))
     for u in decode_field(payload, _ADV_TYPE_UUID128_COMPLETE):
         services.append(bluetooth.UUID(u))
     return services

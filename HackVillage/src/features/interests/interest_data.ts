@@ -1,14 +1,14 @@
-import type {Interest} from "./types.ts";
+import type {Interest} from "./types";
 
 //A technical safety limit, not a list of available interests. Change it here.
 export const MAX_INTERESTS = 100;
 export const MAX_LABEL_LENGTH = 100;
 
 export function readUserCode(value: unknown): string {
-    if (typeof value !== "string" || !/^[A-Z]{3}[0-9]{4}$/.test(value.trim().toUpperCase())) {
-        throw new Error("A user code must look like ABC1234.");
+    if (typeof value !== "string" || !/^[0-9]{6}$/.test(value.trim())) {
+        throw new Error("A user code must contain exactly six digits, for example 001234.");
     }
-    return value.trim().toUpperCase();
+    return value.trim();
 }
 
 export function readLabels(value: unknown): string[] {
