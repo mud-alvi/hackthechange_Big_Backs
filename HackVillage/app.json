@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "HackVillage",
+    "slug": "hackvillage",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "hackvillage",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/expo.icon"
+    },
+    "android": {
+      "package": "com.hackvillage.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#8E63AB",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "server",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#77A79B",
+          "image": "./assets/images/man_face.png",
+          "imageWidth": 150
+        }
+      ],
+      "expo-sqlite",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "e01c722d-79e8-4116-aa9b-1d3aa8eecf03"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e01c722d-79e8-4116-aa9b-1d3aa8eecf03"
+    }
+  }
+}
