@@ -1,20 +1,19 @@
-
 import {
-  Fredoka_400Regular,
-  Fredoka_500Medium,
-  Fredoka_600SemiBold,
-  Fredoka_700Bold,
-  useFonts,
+    Fredoka_400Regular,
+    Fredoka_500Medium,
+    Fredoka_600SemiBold,
+    Fredoka_700Bold,
+    useFonts,
 } from '@expo-google-fonts/fredoka';
 
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,10 +23,7 @@ import { IntroBackground } from '../components/intro/IntroBackground';
 import { WavingMascot } from '../components/intro/WavingMascot';
 import { useIntroAuth } from '../hooks/useIntroAuth';
 
-import {
-  INTRO_COLORS as C,
-  INTRO_FONTS as F,
-} from '../constants/introTheme';
+import { INTRO_COLORS as C, INTRO_FONTS as F } from '../constants/introTheme';
 
 export default function IntroScreen() {
   const auth = useIntroAuth();
@@ -63,9 +59,7 @@ export default function IntroScreen() {
           {/* Branding */}
           <View style={styles.header}>
             <Text style={styles.brand}>HackVillage</Text>
-            <Text style={styles.tagline}>
-              Meet people. Make memories. ♡
-            </Text>
+            <Text style={styles.tagline}>Meet people. Make memories. ♡</Text>
           </View>
 
           {/* Login / Sign up */}

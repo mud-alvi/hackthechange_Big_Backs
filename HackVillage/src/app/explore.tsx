@@ -1,4 +1,4 @@
-import { Image } from 'expo-image';
+{/*import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
 import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -178,3 +178,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+
+*/}
+
+import { Redirect } from 'expo-router';
+export default function ExploreScreen() {
+  return <Redirect href="/home" />;
+}

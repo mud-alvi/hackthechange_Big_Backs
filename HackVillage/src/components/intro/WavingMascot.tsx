@@ -42,6 +42,7 @@ export function WavingMascot() {
         Animated.timing(wave, {
           toValue: 0,
           duration: 450,
+          easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         }),
         Animated.delay(800),
@@ -76,13 +77,14 @@ export function WavingMascot() {
 
   const waveRotation = wave.interpolate({
     inputRange: [-1, 0, 1],
-    outputRange: ['-28deg', '-8deg', '24deg'],
+    outputRange: ['-35deg', '-15deg', '10deg'],
   });
 
   return (
     <View style={styles.container}>
       <View pointerEvents="none" style={styles.stage}>
-        {/* Translucent glass bubble */}
+
+        {/* Glass background bubble */}
         <View style={styles.glassBubble}>
           <View style={styles.shine} />
         </View>
@@ -91,33 +93,38 @@ export function WavingMascot() {
         <View style={styles.pinkBubble} />
         <View style={styles.purpleBubble} />
 
-        {/* Ground platform */}
+        {/* Ground shadow */}
         <View style={styles.platform} />
         <View style={styles.shadow} />
 
-        {/* Your mascot */}
+        {/* Animated mascot */}
         <Animated.View
           style={[
             styles.character,
-            { transform: [{ translateY: float }] },
+            {
+              transform: [{ translateY: float }],
+            },
           ]}
         >
+          {/* Main mascot: face, body, legs */}
           <Image
             source={require('../../../assets/images/Intro_man_face_no_left_arm.png')}
             resizeMode="contain"
             style={styles.characterImage}
           />
 
-          {/* Character's left arm: animated separately */}
+          {/* Separately waving arm */}
           <Animated.View
             style={[
               styles.armJoint,
-              { transform: [{ rotate: waveRotation }] },
+              {
+                transform: [{ rotate: waveRotation }],
+              },
             ]}
           >
             <Image
               source={require('../../../assets/images/Left Arm.png')}
-              resizeMode="stretch"
+              resizeMode="contain"
               style={styles.armImage}
             />
           </Animated.View>
@@ -194,22 +201,22 @@ const styles = StyleSheet.create({
 
   platform: {
     position: 'absolute',
-    bottom: 6,
+    bottom: 10,
     alignSelf: 'center',
-    width: 240,
-    height: 48,
+    width: 150,
+    height: 18,
     borderRadius: 100,
-    backgroundColor: C.violet,
+    backgroundColor: 'rgba(102,87,232,0.12)',
   },
 
   shadow: {
     position: 'absolute',
-    bottom: 31,
+    bottom: 13,
     alignSelf: 'center',
-    width: 125,
-    height: 16,
+    width: 105,
+    height: 10,
     borderRadius: 20,
-    backgroundColor: 'rgba(35,20,78,0.18)',
+    backgroundColor: 'rgba(35,20,78,0.12)',
   },
 
   character: {
@@ -230,18 +237,18 @@ const styles = StyleSheet.create({
 
   armJoint: {
     position: 'absolute',
-    left: 208,
-    top: 129,
+    left: 160,
+    top: 100,
     width: 1,
     height: 1,
   },
 
   armImage: {
     position: 'absolute',
-    left: 0,
-    top: -5,
-    width: 43,
-    height: 65,
+    left: -15,
+    top: -100,
+    width: 160,
+    height: 220,
   },
 
   caption: {
