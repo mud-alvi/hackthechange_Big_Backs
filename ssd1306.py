@@ -126,6 +126,28 @@ class SSD1306_I2C(SSD1306):
     def write_data(self, buf):
         self.write_list[1] = buf
         self.i2c.writevto(self.addr, self.write_list)
+    ###
+    def large_text(display_obj, text, x, y, size=2, color=1):
+        """Draws text scaled up by a factor of 'size' (e.g., 2x or 3x)"""
+        # Create a small temporary buffer for a single character (8x8 pixels = 8 bytes)
+        char_buf = bytearray(8)
+        char_fb = framebuf.FrameBuffer(char_buf, 8, 8, framebuf.MONO_HMSB)
+        
+        current_x = x
+        for char in text:
+            char_fb.fill(0)
+            char_fb.text(char, 0, 0, 1) # Draw character onto temporary buffer
+            
+            # Scale each pixel of the character up to the main display
+            for col in range(8):
+                for row in range(8):
+                    if char_fb.pixel(col, row):
+                        # Draw a solid block instead of a single pixel
+                        display_obj.fill_rect(current_x + (col * size), y + (row * size), size, size, color)
+                        
+            current_x += 8 * size # Move cursor to the right for the next character
+     
+        ###
 
 
 class SSD1306_SPI(SSD1306):
