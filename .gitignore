@@ -1,8 +1,17 @@
-#Local settings and saved personal profiles
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Test cache
+.pytest_cache/
+
+# Environment variables and secrets
 .env
 .env.*
-!.env.example
-python/data/
-__pycache__/
-*.pyc
-.venv/
+
+# macOS
+.DS_Store
