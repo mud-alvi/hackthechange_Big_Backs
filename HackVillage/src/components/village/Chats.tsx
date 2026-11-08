@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { CodingQuiz } from './CodingQuiz';
 import { useEffect, useRef, useState } from 'react';
 import {
   FlatList,
@@ -188,6 +189,10 @@ export function ChatThread({ id }: { id: string }) {
         ListEmptyComponent={
           <View style={s.firstHello}>
             <Text style={s.hello}>hello, new friend.</Text>
+            <CodingQuiz
+              key={id}
+              storageKey={`hackvillage.coding-quiz.v1.${id}`}
+            />
             <Text style={[ui.body, { textAlign: 'center' }]}>
               You have a beep in common. See what else you share.
             </Text>

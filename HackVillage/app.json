@@ -4,11 +4,11 @@
     "slug": "hackvillage",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_main.png",
     "scheme": "hackvillage",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/logo_main.icon",
       "bundleIdentifier": "com.hackvillage.app",
       "infoPlist": {
         "UIBackgroundModes": [
@@ -21,8 +21,7 @@
       "package": "com.hackvillage.app",
       "adaptiveIcon": {
         "backgroundColor": "#8E63AB",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/logo_main.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -44,8 +43,8 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#77A79B",
-          "image": "./assets/images/man_face.png",
+          "backgroundColor": "#8E63AB",
+          "image": "./assets/images/logo_main.png",
           "imageWidth": 150
         }
       ],
